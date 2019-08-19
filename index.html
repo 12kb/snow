@@ -14,6 +14,15 @@
                 width: 100%;
                 height: 100%;
             }
+
+            input {
+                position: absolute;
+                height: 50px;
+                widows: 300px;
+                top: 50px;
+                left: 550px;
+                font-size: 20pt;
+            }
         </style>
     </head>
     <body>
@@ -22,9 +31,12 @@
                 <rect id="kek" x="0" y="320" style="fill:black;stroke:white" height="20" width="20"></rect>
             </svg>
         </div>
+        <input id="циклупи" disabled="disabled">
         <script>
             var svgNS = "http://www.w3.org/2000/svg";
             const container = document.querySelector("#svg");
+
+            document.getElementById('циклупи').value = '0';
 
             const цвета = [
                 'pink',
@@ -38,7 +50,7 @@
                 'black'
             ];
 
-            function addRectOnTop(x) {
+            function addRectOnTop(x, cost) {
                 const rect = document.createElementNS(svgNS, 'rect');
                 rect.setAttributeNS(null, 'width', 20);
                 rect.setAttributeNS(null, 'height', 20);
@@ -49,6 +61,13 @@
                 rect.setAttributeNS(null, 'y', 0);
                 rect.setAttributeNS(null, 'x', x);
                 container.appendChild(rect);
+
+                rect.addEventListener('pointerdown', () => {
+                    const scores = document.getElementById('циклупи');
+                    scores.value = Number(scores.value) + cost;
+                    rect.remove();
+                });
+
                 return rect;
             }
 
@@ -58,8 +77,8 @@
                 el.setAttribute('y', ny);
             }
 
-            function startTrack(x, step) {
-                const rect = addRectOnTop(x);
+            function startTrack(x, step, cost) {
+                const rect = addRectOnTop(x, cost);
 
                 function go() {
                     if (rect.getAttribute('y') < 640) {
@@ -72,17 +91,23 @@
             }
 
             function scheduleTracks() {
-                const delay = 10 + Math.floor(Math.random() * 20);
+                const delay = 100 + Math.floor(Math.random() * 300);
                 const x = Math.floor(Math.random() * 25) * 20;
                 const step = 100 + Math.floor(Math.random() * 400);
+                let cost;
+                if (step < 200) {
+                    cost = 3;
+                } else {
+                    cost = 2;
+                }
                 new Promise((resolve) => setTimeout(resolve, delay))
-                    .then(() => startTrack(x, step))
+                    .then(() => startTrack(x, step, cost))
                     .then(() => scheduleTracks());
             }
 
+
+
             scheduleTracks();
-
-
 
             const svg = document.getElementById("svg");
             const rect = document.getElementById("kek");
